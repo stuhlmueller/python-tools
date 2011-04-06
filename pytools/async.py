@@ -1,13 +1,22 @@
-import os, signal, time
-from pytools import asyncproc
+#!/usr/bin/python
+
+import os
+import signal
+import time
+from pytools.external.asyncproc import Process
 from pytools.datastructures.string import IncStringIO
 from threading import Thread, Lock, Event
 from datetime import datetime
 
 
-class StoppableThread (Thread):
-    """Thread class with a stop() method. The thread itself has to check
-    regularly for the stopped() condition."""
+__all__ = ['AsyncThread', 'run_async', 'make_async_thread']
+
+
+class StoppableThread(Thread):
+    """
+    Thread class with a stop() method. The thread itself has to check
+    regularly for the stopped() condition.
+    """
 
     def __init__(self):
         super(StoppableThread, self).__init__()
@@ -41,10 +50,12 @@ class AsyncThread(StoppableThread):
             if out != "":
                 self.store.write(out)
 
+                
 def make_async_thread(cmd):
-    proc = asyncproc.Process(cmd)
+    proc = Process(cmd)
     store = IncStringIO()
     return AsyncThread(proc, store)
+
 
 def run_async(cmd, timeout=None, handler=None):
     thread = make_async_thread(cmd)

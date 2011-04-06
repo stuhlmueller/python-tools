@@ -1,4 +1,10 @@
+#!/usr/bin/python
+
 from StringIO import StringIO
+
+
+__all__ = ['IncStringIO']
+
 
 class IncStringIO(StringIO):
     def __init__(self, *args, **kwargs):
