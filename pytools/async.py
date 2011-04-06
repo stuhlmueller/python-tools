@@ -42,18 +42,17 @@ class AsyncThread(StoppableThread):
 
     def run(self, graceperiod=.1):
         while True:
+            poll = self.proc.wait(os.WNOHANG)
+            out = self.proc.read()
+            if out != "":
+                self.store.write(out)
+            if poll != None:
+                break                
             if self.stopped():
                 os.kill(self.proc.pid(), signal.SIGTERM)
                 time.sleep(graceperiod)
                 os.kill(self.proc.pid(), signal.SIGKILL)
                 break
-            poll = self.proc.wait(os.WNOHANG)
-            if poll != None:
-                break
-            out = self.proc.read()
-            if out != "":
-                self.store.write(out)
-
                 
 def make_async_thread(cmd):
     proc = Process(cmd)
