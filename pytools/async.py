@@ -30,6 +30,10 @@ class StoppableThread(Thread):
 
     
 class AsyncThread(StoppableThread):
+    """
+    Thread class that encapsulates an asynchronous procedure and an
+    incremental string file object.
+    """
 
     def __init__(self, proc, store):
         super(AsyncThread, self).__init__()
@@ -40,7 +44,7 @@ class AsyncThread(StoppableThread):
         while True:
             if self.stopped():
                 os.kill(self.proc.pid(), signal.SIGTERM)
-                time.sleep(.1)
+                time.sleep(graceperiod)
                 os.kill(self.proc.pid(), signal.SIGKILL)
                 break
             poll = self.proc.wait(os.WNOHANG)
