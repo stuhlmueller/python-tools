@@ -9,7 +9,7 @@ from threading import Thread, Lock, Event
 from datetime import datetime
 
 
-__all__ = ['AsyncThread', 'run_async', 'make_async_thread']
+__all__ = ['AsyncThread', 'run_async']
 
 
 class StoppableThread(Thread):
@@ -31,21 +31,25 @@ class StoppableThread(Thread):
     
 class AsyncThread(StoppableThread):
     """
-    Thread class that encapsulates an asynchronous procedure and an
+    Thread class that encapsulates an asynchronous command and an
     incremental string file object.
     """
 
-    def __init__(self, proc, store):
+    def __init__(self, cmd):
         super(AsyncThread, self).__init__()
-        self.proc = proc
-        self.store = store
+        self.proc = Process(cmd)
+        self.out = IncStringIO()
+        self.err = IncStringIO()
 
     def run(self, graceperiod=.1):
         while True:
             poll = self.proc.wait(os.WNOHANG)
             out = self.proc.read()
+            err = self.proc.readerr()
             if out != "":
-                self.store.write(out)
+                self.out.write(out)
+            if err != "":
+                self.err.write(err)
             if poll != None:
                 break                
             if self.stopped():
@@ -54,21 +58,16 @@ class AsyncThread(StoppableThread):
                 os.kill(self.proc.pid(), signal.SIGKILL)
                 break
                 
-def make_async_thread(cmd):
-    proc = Process(cmd)
-    store = IncStringIO()
-    return AsyncThread(proc, store)
-
 
 def run_async(cmd, timeout=None, handler=None):
-    thread = make_async_thread(cmd)
+    thread = AsyncThread(cmd)
     thread.start()
     t0 = datetime.now()
     runtime = 0
-    while thread.is_alive() and not (timeout and (runtime > timeout)):
+    while thread.is_alive() and not (timeout and (runtime.seconds > timeout)):
         if handler:
-            handler(thread.store)
-        runtime = (datetime.now() - t0).seconds
+            handler(thread.out, thread.err)
+        runtime = (datetime.now() - t0)
     thread.stop()
     thread.join()
-    return (runtime, thread.store)
+    return (runtime, thread.out, thread.err)
