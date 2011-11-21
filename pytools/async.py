@@ -63,7 +63,7 @@ def run_async(cmd, timeout=None, handler=None):
     thread = AsyncThread(cmd)
     thread.start()
     t0 = datetime.now()
-    runtime = 0
+    runtime = t0 - t0
     while thread.is_alive() and not (timeout and (runtime.seconds > timeout)):
         if handler:
             handler(thread.out, thread.err)
