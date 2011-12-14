@@ -15,3 +15,4 @@ To add a directory to your `$PYTHONPATH`, `cd` into the directory and type <code
 - Simon Willison's [optfunc](https://github.com/simonw/optfunc)
 - [StoppableThread](http://stackoverflow.com/questions/323972/is-there-any-way-to-kill-a-thread-in-python)
 - [asyncproc](http://www.lysator.liu.se/~bellman/download/)
+- [instancemethod pickling](http://bytes.com/topic/python/answers/552476-why-cant-you-pickle-instancemethods#post2155350)
