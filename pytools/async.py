@@ -35,9 +35,9 @@ class AsyncThread(StoppableThread):
     incremental string file object.
     """
 
-    def __init__(self, cmd):
+    def __init__(self, cmd, **kwargs):
         super(AsyncThread, self).__init__()
-        self.proc = Process(cmd)
+        self.proc = Process(cmd, **kwargs)
         self.out = IncStringIO()
         self.err = IncStringIO()
 
@@ -59,8 +59,8 @@ class AsyncThread(StoppableThread):
                 break
                 
 
-def run_async(cmd, timeout=None, handler=None):
-    thread = AsyncThread(cmd)
+def run_async(cmd, timeout=None, handler=None, **kwargs):
+    thread = AsyncThread(cmd, **kwargs)
     thread.start()
     t0 = datetime.now()
     runtime = t0 - t0
